@@ -1,7 +1,8 @@
 from tkinter import *
 import random
 from tkinter import colorchooser,messagebox
-
+import pygame
+from Snake import welcome_snake
 
 
 class Snake(Tk):
@@ -17,12 +18,23 @@ class Snake(Tk):
         self.canvas = Canvas(self,width=self.width,height=self.height,bg="#fff")
         self.canvas.pack()
 
+        # icon for the game
+        self.icon = PhotoImage(file="Images/img.png")
+        self.iconphoto(True,self.icon)
+
+        # Initialize pygame mixer
+        pygame.mixer.init()
+        # Load Songs
+        self.background_music = pygame.mixer.Sound("Songs/time to call.mp3")
+        # self.eat_song = pygame.mixer.Sound("")
+
+        # Play background song
+        pygame.mixer.Sound.play(self.background_music,loops=-1)
+
         # Initialize game
         self.snake = [(40,40),(30,40), (20,40)]
         self.food = self.create_food()
         self.direction = "Right"
-        self.segment_width = 14
-        self.segment_height = 14
         self.bind("<KeyPress>",self.change_direction)
         self.update_snake()
 
@@ -44,9 +56,10 @@ class Snake(Tk):
             print("You choosed :",color[1])
 
     def create_food(self):
-        x = random.randint(0,(self.width // 12) -1)* 10
-        y = random.randint(0, (self.height //12) -1)*10
-        self.canvas.create_oval(x,y,x+10,y+10,fill="red",outline="red",tags="food")
+        color = random.choice(["red","blue","green","orange","purple","gray","black"])
+        x = random.randint(10,(self.width // 10  ) - 2)* 10
+        y = random.randint(10,(self.height // 10 ) - 2)*10
+        self.canvas.create_oval(x,y,x+10,y+10,fill=color,outline=color,tags="food")
 
         return (x,y)
 
@@ -81,14 +94,30 @@ class Snake(Tk):
         # Customizing the snake: Different colors for head and body and adding eyes
         for index, (x, y) in enumerate(self.snake):
             if index == 0:
-                color = "blue"  # Head color
-                self.canvas.create_rectangle(x, y, x + 14, y + 17, fill=color, tag="snake")
-                # Adding eyes to the head
-                self.canvas.create_oval(x + 4, y + 2, x + 6, y + 6, fill="white", tag="snake")
-                self.canvas.create_oval(x + 8, y + 2, x + 10, y + 6, fill="white", tag="snake")
+                # Draw the head with gradient and details
+                color = "#1E90FF"  # Blue for the head
+                self.canvas.create_oval(x, y, x + 20, y + 20, fill=color, outline="#00008B", width=2,tag="snake")  # Head (same size as body)
+
+                # Draw eyes (smaller and better positioned)
+                eye_size = 6  # Size of the eyes
+                self.canvas.create_oval(x + 5, y + 5, x + 5 + eye_size, y + 5 + eye_size,fill="white", outline="black", width=1, tag="snake")  # Left eye
+                self.canvas.create_oval(x + 11, y + 5, x + 11 + eye_size, y + 5 + eye_size,fill="white", outline="black", width=1, tag="snake")  # Right eye
+
+                # Draw pupils (smaller and centered in the eyes)
+                pupil_size = 2  # Size of the pupils
+                self.canvas.create_oval(x + 6, y + 6, x + 6 + pupil_size, y + 6 + pupil_size,fill="black", tag="snake")  # Left pupil
+                self.canvas.create_oval(x + 12, y + 6, x + 12 + pupil_size, y + 6 + pupil_size,fill="black", tag="snake")  # Right pupil
+
+                # Draw tongue (smaller and better positioned)
+                self.canvas.create_line(x + 10, y + 18, x + 10, y + 22,fill="red", width=2, tag="snake")  # Tongue
+
             else:
-                color = "green"  # Body color
-                self.canvas.create_rectangle(x, y, x + 12, y + 17, fill=color, tag="snake")
+                # Draw the body with gradient and scales
+                color = "#32CD32"  # Green for the body
+                self.canvas.create_oval(x, y, x + 20, y + 20, fill=color, outline="#228B22", width=2,tag="snake")  # Body
+
+                # Draw scales (optional)
+                self.canvas.create_arc(x + 5, y + 5, x + 15, y + 15,start=0, extent=180, fill="#228B22", outline="#228B22", tag="snake")  # Scales
 
 
         if self.check_collision():
@@ -99,7 +128,10 @@ class Snake(Tk):
     def check_collision(self):
         head_x,head_y = self.snake[0]
 
-        if head_x < 0 or head_x >= self.width or head_y < 0 or head_y >= self.height:
+        if head_x < 3 or head_x >= self.width - 10 or head_y < 3 or head_y >= self.height - 10:
+            return True
+
+        if (head_x,head_y) in self.snake[1:]:
             return True
         if len(self.snake) != len(set(self.snake)):
             return  True
@@ -107,6 +139,26 @@ class Snake(Tk):
 
     def game_over(self):
         messagebox.showinfo(title="Game Over",message="You lost\nYour Score is : ")
+        play_again = messagebox.askyesno(title="Play Again",message="Do you want to play Again ?")
+
+        if play_again:
+            self.restart_game()
+        else:
+            self.destroy()
+            pygame.mixer.Sound.stop(self.background_music)
+            welcome = welcome_snake.Welcome_snake()
+            welcome.mainloop()
+
+
+    def restart_game(self):
+        self.canvas.delete("snake")
+        self.canvas.delete("food")
+        self.food = self.create_food()
+        self.snake = [(40, 40), (30, 40), (20, 40)]
+        self.direction = "Right"
+        self.update_snake()
+
+
 if __name__ == "__main__":
     snake_game = Snake()
     snake_game.mainloop()
