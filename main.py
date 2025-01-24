@@ -18,6 +18,15 @@ class Snake(Tk):
         self.canvas = Canvas(self,width=self.width,height=self.height,bg="#fff")
         self.canvas.pack()
 
+        # Border of the game
+        self.canvas.create_rectangle(14,14,self.width -10,self.height -10,outline="#000",width=8)
+
+        # label for the score of the player
+        self.CURRENT = 0
+        self.score = Label(self,text=f"Your Score : {self.CURRENT}",font=("Impact",18),bg="#fff",justify="center")
+        self.score.place(x=350,y=20)
+
+
         # icon for the game
         self.icon = PhotoImage(file="Images/img.png")
         self.iconphoto(True,self.icon)
@@ -53,12 +62,13 @@ class Snake(Tk):
         if event.keysym:
             color = colorchooser.askcolor()
             self.canvas.config(bg=color[1])
+            self.score.config(bg=color[1])
             print("You choosed :",color[1])
 
     def create_food(self):
         color = random.choice(["red","blue","green","orange","purple","gray","black"])
-        x = random.randint(10,(self.width // 10  ) - 2)* 10
-        y = random.randint(10,(self.height // 10 ) - 2)*10
+        x = random.randint(10,(self.width // 10  ) - 9)* 10
+        y = random.randint(10,(self.height // 10 ) - 9)* 10
         self.canvas.create_oval(x,y,x+10,y+10,fill=color,outline=color,tags="food")
 
         return (x,y)
@@ -84,6 +94,8 @@ class Snake(Tk):
 
         if (head_x,head_y) == self.food:
             self.canvas.delete("food")
+            self.CURRENT += 10
+            self.score.config(text=f"Your Score : {self.CURRENT}")
             self.food = self.create_food()
 
         else:
@@ -128,7 +140,7 @@ class Snake(Tk):
     def check_collision(self):
         head_x,head_y = self.snake[0]
 
-        if head_x < 3 or head_x >= self.width - 10 or head_y < 3 or head_y >= self.height - 10:
+        if head_x < 24 or head_x >= self.width - 31 or head_y < 29 or head_y >= self.height - 30:
             return True
 
         if (head_x,head_y) in self.snake[1:]:
@@ -138,7 +150,7 @@ class Snake(Tk):
         return  False
 
     def game_over(self):
-        messagebox.showinfo(title="Game Over",message="You lost\nYour Score is : ")
+        messagebox.showinfo(title="Game Over",message=f"You lost\nYour Score is : {self.CURRENT}")
         play_again = messagebox.askyesno(title="Play Again",message="Do you want to play Again ?")
 
         if play_again:
