@@ -144,14 +144,22 @@ class Snake(Tk):
         if self.check_collision():
             self.game_over()
         else:
-             if self.CURRENT < 700:
-                self.after(100,self.update_snake)
-             elif self.CURRENT >=700 and self.CURRENT <= 1000:
-                 self.after(100,self.update_snake)
-             elif self.CURRENT >= 1000 and self.CURRENT <= 1600:
-                 self.after(60,self.update_snake)
-             elif self.CURRENT >= 2000:
-                 self.after(40,self.update_snake)
+                if self.CURRENT < 500:
+                    delay = 100
+                elif self.CURRENT < 1000:
+                    delay = 80
+                elif self.CURRENT < 1500:
+                    delay = 60
+                elif self.CURRENT < 2000:
+                    delay = 40
+                elif self.CURRENT < 2500:
+                    delay = 30
+                elif self.CURRENT < 3000:
+                    delay = 20
+                else:
+                    delay = 10
+
+                self.after(delay,self.update_snake)
 
     def check_collision(self):
         head_x,head_y = self.snake[0]
