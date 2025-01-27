@@ -24,7 +24,7 @@ class Snake(Tk):
         # label for the score of the player
         self.CURRENT = 0
         self.score = Label(self,text=f"Your Score : {self.CURRENT}",font=("Impact",18),bg="#fff",justify="center")
-        self.score.place(x=350,y=20)
+        self.score.place(x=340,y=20)
 
 
         # icon for the game
@@ -41,7 +41,7 @@ class Snake(Tk):
         pygame.mixer.Sound.play(self.background_music,loops=-1)
 
         # Initialize game
-        self.snake = [(40,40),(30,40), (20,40)]
+        self.snake = [(40,60),(30,40), (20,40)]
         self.food = self.create_food()
         self.direction = "Right"
         self.bind("<KeyPress>",self.change_direction)
@@ -74,8 +74,16 @@ class Snake(Tk):
         return (x,y)
 
     def change_direction(self,event):
+        opposite_directions  = {
+            "Up" : "Down",
+            "Down" : "Up",
+            "Left" : "Right",
+            "Right" : "Left"
+        }
         if event.keysym in ["Up","Down","Left","Right"]:
-            self.direction = event.keysym
+            # check if the new direction isn't the oposite of the old direction
+            if event.keysym != opposite_directions.get(self.direction):
+                self.direction = event.keysym
 
 
     def update_snake(self):
@@ -94,7 +102,8 @@ class Snake(Tk):
 
         if (head_x,head_y) == self.food:
             self.canvas.delete("food")
-            self.CURRENT += 10
+            self.random_score = [10,20,30,15,12,23,24]
+            self.CURRENT += random.choice(self.random_score)
             self.score.config(text=f"Your Score : {self.CURRENT}")
             self.food = self.create_food()
 
@@ -135,7 +144,14 @@ class Snake(Tk):
         if self.check_collision():
             self.game_over()
         else:
-            self.after(100,self.update_snake)
+             if self.CURRENT < 700:
+                self.after(100,self.update_snake)
+             elif self.CURRENT >=700 and self.CURRENT <= 1000:
+                 self.after(100,self.update_snake)
+             elif self.CURRENT >= 1000 and self.CURRENT <= 1600:
+                 self.after(60,self.update_snake)
+             elif self.CURRENT >= 2000:
+                 self.after(40,self.update_snake)
 
     def check_collision(self):
         head_x,head_y = self.snake[0]
@@ -158,8 +174,8 @@ class Snake(Tk):
         else:
             self.destroy()
             pygame.mixer.Sound.stop(self.background_music)
-            welcome = welcome_snake.Welcome_snake()
-            welcome.mainloop()
+            welcome = welcome_snake.Welcome_snake().mainloop() # go to the welcome page
+
 
 
     def restart_game(self):
