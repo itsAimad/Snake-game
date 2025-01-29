@@ -46,7 +46,7 @@ class Snake(Tk):
         self.direction = "Right"
         self.bind("<KeyPress>",self.change_direction)
         self.update_snake()
-
+        self.CURRENT = 0
 
     def center_screen(self):
         screen_width = self.winfo_screenwidth()
@@ -142,10 +142,11 @@ class Snake(Tk):
 
 
         if self.check_collision():
+            pygame.mixer.Sound.stop(self.background_music)
             self.game_over()
         else:
                 if self.CURRENT < 500:
-                    delay = 100
+                    delay = 90
                 elif self.CURRENT < 1000:
                     delay = 80
                 elif self.CURRENT < 1500:
@@ -177,16 +178,21 @@ class Snake(Tk):
         messagebox.showinfo(title="Game Over",message=f"You lost\nYour Score is : {self.CURRENT}")
         play_again = messagebox.askyesno(title="Play Again",message="Do you want to play Again ?")
 
+
         if play_again:
             self.restart_game()
+
         else:
             self.destroy()
             pygame.mixer.Sound.stop(self.background_music)
-            welcome = welcome_snake.Welcome_snake().mainloop() # go to the welcome page
+            welcome_snake.Welcome_snake().mainloop() # go to the welcome page
 
 
 
     def restart_game(self):
+        self.CURRENT = 0
+        self.score.config(text=f"Your Score : {self.CURRENT}")
+        pygame.mixer.Sound.play(self.background_music)
         self.canvas.delete("snake")
         self.canvas.delete("food")
         self.food = self.create_food()
