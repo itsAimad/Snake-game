@@ -57,7 +57,7 @@ class Snake(Tk):
         x = (screen_width // 2) - (self.width // 2)
         y = (screen_height //2) - (self.height //2)
 
-        self.geometry(f"{self.width}x{self.height}+{x}+{y}")
+        self.geometry(f"{self.width}x{self.height}+{x}+{y}") # to center the window
 
     def background(self, event):
         if event.keysym:
