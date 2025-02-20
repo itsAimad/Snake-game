@@ -1,8 +1,11 @@
+import tkinter
 from tkinter import *
-from tkinter import colorchooser
+from tkinter import colorchooser,ttk
 from PIL import Image, ImageTk
-import subprocess
+from PIL.ImageOps import expand
+
 from Snake import main
+from MongoDatabase import mongo_connection
 
 
 
@@ -49,7 +52,34 @@ class Welcome_snake(Tk):
 
 
     def view_scores(self):
-        pass
+
+        # new window for scores
+        table = Toplevel(self)
+        table.title("Scores 💯")
+
+        # Create a treeview widget
+        tree = ttk.Treeview(table,columns=("Date","Score"),show="headings")
+        tree.heading("Date",text="Date")
+        tree.heading("Score",text="Score")
+
+        # Retreive data
+        scores = self.retreive_scores()
+
+        for score in scores:
+            tree.insert("",END,values=(score["Date"],score["Score"]))
+
+
+        tree.pack(fill=BOTH,expand=True)
+    def retreive_scores(self):
+        scores_collection = mongo_connection()
+        scores = scores_collection.find({},{"_id":0,"Date":1,"Score":1})
+
+        return list(scores)
+
+
+
+
+
 
     def center_screen(self):
 
@@ -61,6 +91,8 @@ class Welcome_snake(Tk):
         y = (screen_height // 2) - (self.height //2)
 
         self.geometry(f"{self.width}x{self.height}+{x}+{y}")
+
+        return  screen_width,screen_height
 
     def check_background(self,event):
 

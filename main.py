@@ -3,7 +3,8 @@ import random
 from tkinter import colorchooser,messagebox
 import pygame
 from Snake import welcome_snake
-
+from MongoDatabase import mongo_connection
+from datetime import datetime
 
 class Snake(Tk):
     
@@ -179,13 +180,38 @@ class Snake(Tk):
         play_again = messagebox.askyesno(title="Play Again",message="Do you want to play Again ?")
 
 
+
         if play_again:
             self.restart_game()
+            # insert the score to document in mongoDB
+            mongo_collection = mongo_connection()
+
+            query = mongo_collection.insert_one(
+                {"Date": datetime.now().strftime("%m-%d-%y %H:%M:%S"), "Score": self.CURRENT})
+
+            if (query):
+                print("New Score just added go check it !")
+            else:
+                print("Not Yet")
 
         else:
+            # insert the new score to mongoDB
+            mongo_collection = mongo_connection()
+            query = mongo_collection.insert_one(
+                {"Date": datetime.now().strftime("%m-%d-%y %H:%M:%S"), "Score": self.CURRENT}
+            )
+
+            if (query):
+                print("New Score just added go check it !")
+            else:
+                print("Not Yet")
             self.destroy()
             pygame.mixer.Sound.stop(self.background_music)
             welcome_snake.Welcome_snake().mainloop() # go to the welcome page
+
+
+
+
 
 
 
@@ -202,5 +228,4 @@ class Snake(Tk):
 
 
 if __name__ == "__main__":
-    snake_game = Snake()
-    snake_game.mainloop()
+    Snake().mainloop()
