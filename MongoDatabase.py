@@ -6,7 +6,7 @@ from pymongo import MongoClient
 
 def mongo_connection():
     # client
-    client = MongoClient("CONNECT TO YOUR MONGODB LOCALHOST")
+    client = MongoClient("CONNECT TO YOUR MONGODB LOCALHOST") # here
 
     # db
     db = client["SnakeGame"]
