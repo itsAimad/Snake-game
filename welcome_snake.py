@@ -3,7 +3,6 @@ from tkinter import *
 from tkinter import colorchooser,ttk
 from PIL import Image, ImageTk
 from PIL.ImageOps import expand
-
 from Snake import main
 from MongoDatabase import mongo_connection
 
