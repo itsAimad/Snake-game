@@ -7,6 +7,7 @@ from MongoDatabase import mongo_connection
 from datetime import datetime
 
 class Snake(Tk):
+
     
     def __init__(self):
         super().__init__()
